@@ -1,7 +1,7 @@
 # C-minus
 2016년 컴파일러 수업의 과제였던 C-minus 제작을 위한 프로젝트.
 
-##전체개요
+## 전체개요
 컴파일 과정은 크게 Scan, Parse, Symbol Table 생성, Type Check, Code 생성 등 5가지 단계로 구성된다. 이 프로젝트에서는 Tiny Compiler를 C언어의 간략한 버전인 C-Minus 문법에 맞게 코드를 수정하여 새로운 C-minus 컴파일러를 제작하는 것이 목표다.
 
 * program → declaration-list 
@@ -36,11 +36,11 @@
 
 C-minus 컴파일러 제작은 Ubuntu 14.04 LTS (on VMWare Workstation 12 Pro) 환경에서 c파일들과 Makefile을 수정하며 진행했으며 컴파일러의 마지막 단계에서 생성되는 코드는 Tiny Machine(TM)에서 구동되는 어셈블리어로 생성된다.
 
-###Step 1 – Scanner
-####개요
+### Step 1 – Scanner
+#### 개요
 스캐너는 소스코드를 의미 있는 단어(토큰)들로 분석해주는 단계이며 이 단계에서 Lexical Analysis가 수행된다. Lexical Analysis는 일반적으로 DFA를 이용하며 C-minus의 참고용 DFA는 보고서에 첨부했다.
 
-####구현방식 및 구현과정
+#### 구현방식 및 구현과정
 (1) scan.c 수정방식
 
 * main.c 수정사항
@@ -142,7 +142,7 @@ while (1)
 }
 ```
 
-####실행방법 및 실행결과
+#### 실행방법 및 실행결과
 (1) scan.c 수정 방식
 * 실행방법
 ```
@@ -324,11 +324,11 @@ TINY COMPILATION: test.cm
 	17: EOF
 ```
 
-###Step 2 – Parser
-####개요
+### Step 2 – Parser
+#### 개요
 파서는 스캐너를 통해 얻어진 토큰들을 이용해 구문 분석(Syntax Analysus)을 하여 파스 트리를 만드는 과정을 수행한다.
 
-####구현방식 및 구현과정
+#### 구현방식 및 구현과정
 이 프로젝트에서 파서를 구현하는 방법은 이전 단계에서 구현한 C-Minus Scanner를 이용하는 방법과 Yacc(bison)을 이용하는 방법이 있다. 하지만 컴파일러의 전체적인 구현 과정을 구체적으로 파악하고자 이전 단계에서 구현한 C-Minus Scanner를 이용한다.
 
 * main.c 수정사항
@@ -400,7 +400,7 @@ TreeNode * newExpNode(ExpKind kind)
 }
 ```
 
-####실행방법 및 실행결과
+#### 실행방법 및 실행결과
 * 실행방법
 
 ```
@@ -447,11 +447,11 @@ Syntax tree:
           Id : x
           Id : y
 ```
-###Step 3 – Semantic Analysis
-####개요
+### Step 3 – Semantic Analysis
+#### 개요
 의미 분석기는 파서를 통해 생성된 파스 트리를 이용하여 Symbol Table을 생성하고 Type Checker를 구현하는 과정을 수행한다.
 
-####구현방식 및 구현과정
+#### 구현방식 및 구현과정
 C-Minus는 static scope rule을 사용하며 global scope가 최상위 scope다. 스택에 global scope를 push하여 초기화한 후, Compound-Statement(복합문)를 만나면 새로운 scope를 스택에 push하고 해당 Compound-Statement가 끝나면 pop을 한다. 모든 scope들은 스택에서 제거되더라도 실제 scope는 제거되지 않고 남아있다. 
 
 Symbol Table은 스택의 가장 위에 있는 scope에 변수이름, 타입, 메모리 위치 등을 저장하며 생성된다. 전역변수와 함수의 경우, 저장되는 scope는 항상 global scope이며 지역변수만 새로 생성되는 scope들에 저장된다. 또한 input과 output함수는 코드에서 별도로 정의되지 않았더라도 기본적으로 포함되도록 한다.
@@ -579,7 +579,7 @@ input함수와 output함수는 기본적으로 존재하는 함수이므로 이�
 
 Symbol Table 생성이 완료되면 checkNode 함수를 통해 다시 파스트리를 순회하며 Type Check를 수행하는데 Compound Statement는 Symbol Table 생성할 때와 비슷하게 처리한다. 각 TreeNode별로 발생할 수 있는 오류를 각각에 맞게 검출할 수 있도록 한다.
 
-####실행방법 및 실행결과
+#### 실행방법 및 실행결과
 * 실행방법
 ```c
 make cminus
@@ -704,11 +704,11 @@ Checking Types...
 
 Type Checking Finished
 ```
-###Step 4 – Code Generation
-####개요
+### Step 4 – Code Generation
+#### 개요
 코드 생성기는 중간 코드가 기계에서 정상적으로 작동하기 위한 올바른 insruction들을 생성한다. 이 프로젝트에서는 Tiny Machine(TM)에서 동작하는 코드를 생성하고 생성된 코드를 Tiny Machine에서 동작시켜 본다.
 
-####구현방법 및 구현과정
+#### 구현방법 및 구현과정
 메모리는 위에서 아랫방향으로 성장하도록 구현했으며 static scope rule이 적용된다. 메모리는 아래의 구조로 성장하며 코드 생성기에서 사용하는 frame과 메모리와 관련된 레지스터의 이름 및 용도도 아래와 같다.
 ```
 =============================================================
@@ -789,7 +789,7 @@ int addlocation(int size)
 
 각 노드의 종류에 맞는 instruction을 생성하도록 코드를 수정한다. Control flow가 필요한 instruction의 경우 emitSkip함수와 emitRestore함수를 사용한다. instruction 생성이 모두 끝났다면 codeGen함수에서 Tiny Machine 초기화 과정을 거친 후 main함수를 실행하도록 코드를 추가한다.
 
-####실행방법 및 실행결과
+#### 실행방법 및 실행결과
 * 실행방법
 
 cm파일을 C-Minus 컴파일러를 통해 컴파일하면 tm파일이 생성된다. 이 tm파일을 Tiny Machine에서 작동시키면 된다. 생성된 tm파일은 첨부된 test.tm, sort.tm파일을 참고하면 된다.
